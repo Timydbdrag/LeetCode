@@ -1,5 +1,9 @@
 package leetcode;
 
+import org.w3c.dom.ls.LSOutput;
+
+import javax.crypto.spec.PSource;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ListNode {
@@ -10,18 +14,104 @@ public class ListNode {
     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
 
     public static void main(String[] args) {
-        ListNode listNode = new ListNode(1);
-        listNode = insert(listNode,1);
+        ListNode listNode = new ListNode(4);
+        listNode = insert(listNode,3);
         listNode = insert(listNode,2);
-        listNode = insert(listNode,3);
-        listNode = insert(listNode,3);
+        listNode = insert(listNode,5);
+        listNode = insert(listNode,1);
+        listNode = insert(listNode,7);
+
 
 
 /*        while (listNode!=null){
             System.out.println(listNode.val);
             listNode=listNode.next;
         }*/
-        deleteDuplicates1(listNode);
+        insertionSortList(listNode);
+    }
+
+    public static ListNode insertionSortList(ListNode head) {
+        //Runtime: 3 ms, faster than 82.74% of Java online submissions for Insertion Sort List.
+        //Memory Usage: 39.1 MB, less than 25.64% of Java online submissions for Insertion Sort List.
+        if(head==null || head.next==null)return head;
+        ListNode temp = head;
+        ListNode start = head;
+        while (true){
+            if(temp.next == null) break;
+            if(temp.next.val < temp.val){
+                ListNode del = temp.next;
+                temp.next = temp.next.next;
+                ListNode start2 =start;
+                while (true){
+                    if(del.val < start.val){
+                        del.next = start;
+                        start = del;
+                        break;
+                    } else if(del.val < start2.next.val){
+                        del.next = start2.next;
+                        start2.next = del;
+                        break;
+                    } else  start2 = start2.next;
+                }
+
+            } else temp = temp.next;
+
+        }
+        head = start;
+
+        while (head!=null){
+            System.out.println(head.val);
+            head = head.next;
+        }
+
+        return head;
+    }
+
+    public static void reorderList(ListNode head) {
+
+        //2ms
+        if(head != null && head.next != null) {
+            LinkedList<ListNode> listNodes = new LinkedList<>();
+            ListNode temp = head;
+            while (temp.next != null) {
+                listNodes.add(temp.next);
+                temp = temp.next;
+            }
+            temp = head;
+            int i = 0;
+            while (listNodes.size() != 0){
+                if(i%2 == 0){
+                    temp.next = listNodes.pollLast();
+                    temp = temp.next;
+                    temp.next = null;
+                } else  {
+                    temp.next = listNodes.pollFirst();
+                    temp = temp.next;
+                    temp.next = null;
+                }
+                i++;
+            }
+
+/*    //long time 775ms
+      ListNode temp = head;
+            ListNode start = head;
+            while (true){
+                temp = temp.next;
+                if(temp == null || temp.next == null)break;
+                if(temp.next.next == null){
+                    ListNode cur = temp.next;
+                    temp.next = null;
+                    ListNode cur2 = start.next;
+                    start.next = cur;
+                    cur.next = cur2;
+                    temp = cur2;
+                    start = cur.next;
+                }
+            }
+        }*/
+
+        }
+
     }
 
     public static ListNode deleteDuplicates1(ListNode head) {
@@ -32,10 +122,6 @@ public class ListNode {
         while (temp.next!=null){
             if (temp.val == temp.next.val)temp.next=temp.next.next;
             else temp = temp.next;
-        }
-        while (head!=null){
-            System.out.println(head.val);
-            head = head.next;
         }
         return head;
     }

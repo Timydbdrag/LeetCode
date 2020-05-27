@@ -6,20 +6,219 @@ public class tester {
 
     public static void main(String[] args) {
         int[][] matrix = new int[][]{{1,3,5,7},{10,11,16,20},{23,30,34,50}};
-        int[][] matrix2 = new int[][]{{1,2},{3,4}};
-        int[] nums = new int[]{0,0,1,1,1,1,2,3,3};
+        int[][] matrix2 = new int[][]{{1,1},{3,2,},{5,3},{4,1},{2,3},{1,4},{5,0},{6,-1}};
+        int[][] matrix3 = new int[][]{{0,0},{1,1,},{1,-1}};
+        int[] nums = new int[]{1,2,1,3,2,5};
+        List<String> wordDict = new ArrayList<>();
+        wordDict.add("leet");
+        wordDict.add("code");
        // permute(nums);
 /*       rotate(matrix);*/
 /*        String[] str = new String[]{"ak","ka"};
         groupAnagrams(str);*/
-       // System.out.println(pow(-1,-2147483648));
-       // spiralOrder(matrix);
-        //generateMatrix(3);
-        //setZeroes(matrix);
         //System.out.println(searchMatrix(matrix2, 1));
        // System.out.println(removeDuplicates(nums));
+       // System.out.println(search(nums, 0));
+        System.out.println(singleNumber(nums));
+    }
 
-        System.out.println(search(nums, 0));
+    public static int hIndex(int[] citations) {
+        //Runtime: 0 ms, faster than 100.00% of Java online submissions for H-Index II.
+        if(citations.length == 0)return 0;
+        int len = citations.length;
+        int start = 0,end = len-1;
+        int res = 0;
+        while(start <= end){
+            int m = (start+end)/2;
+            if(citations[m] >= len-m){
+                res = Math.max(res,len-m);
+                end = m-1;
+            }else start = m+1;
+        }
+        return res;
+    }
+
+    public static int[] singleNumber(int[] nums) {
+        //Runtime: 1 ms, faster than 99.93% of Java online submissions for Single Number III.
+        int xor = 0;
+        for(int i : nums)
+            xor ^= i;
+        int i = 0;
+        while(((xor >> i) & 1) != 1)
+            i++;
+        int a=0, b=0;
+        for(int x : nums){
+            if(((x>>i) & 1) == 1)
+                a ^= x;
+            else
+                b ^= x;
+        }
+        return new int[]{a,b};
+        //Runtime: 3 ms, faster than 39.10% of Java online submissions for Single Number III.
+/*        HashSet<Integer> temp = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            if(temp.contains(nums[i])){
+                temp.remove(nums[i]);
+            } else temp.add(nums[i]);
+        }
+        int[] res = new int[]{0,0};
+        int i = 0;
+        Iterator<Integer> iter = temp.iterator();
+        while (iter.hasNext()){
+            res[i] = iter.next();
+            i++;
+        }
+        return res;*/
+    }
+
+    public static int findMin(int[] nums) {
+        //Runtime: 0 ms, faster than 100.00% of Java online submissions for Find Minimum in Rotated Sorted Array.
+        int len = nums.length;
+        int l=0,h=len-1,mid = 0;
+        while(l<=h){
+            mid=(h-l)/2+l;
+            if(mid+1<len && mid-1>=0 && nums[mid]<nums[mid+1] && nums[mid-1]>nums[mid]) {
+                return nums[mid];
+            }
+            if(nums[h]>nums[mid])h=mid-1;
+            else l=mid+1;
+        }
+        return nums[mid];
+    }
+
+    public static int maxProduct(int[] nums) {
+        //Runtime: 1 ms, faster than 93.86% of Java online submissions for Maximum Product Subarray.
+        if (nums == null || nums.length == 0) return 0;
+        int max = nums[0];
+        int min = nums[0];
+        int res = max;
+        for (int i = 1; i < nums.length; i++) {
+            int maxTemp = Math.max(Math.max(min * nums[i], nums[i]), max * nums[i]);
+            int minTemp = Math.min(Math.min(min * nums[i], nums[i]), max * nums[i]);
+            max = maxTemp;
+            min = minTemp;
+            res = Math.max(res, max);
+        }
+/*        int max = nums[0];
+        int temp=1;
+        for(int i=0;i<nums.length;i++) {
+            for (int j = i; j < nums.length; j++) {
+                temp*= nums[j];
+                if (temp > max) max = temp;
+            }
+            temp = 1;
+        }*/
+        return res;
+    }
+
+    public static String reverseWords(String s) {
+        String[] ss = s.split("\\s+");
+        StringBuilder builder = new StringBuilder();
+        for (int i = ss.length-1; i >= 0; i--) {
+            builder.append(ss[i] + " ");
+        }
+        return builder.toString().trim();
+    };
+
+    private static boolean myEquals(double a, double b) {
+        return Math.abs(a - b) < 1e-5;
+    }
+    public static int maxPoints(int[][] points) {
+        int res = 0;
+        int n = points.length;
+        if(n<2)
+            return n;
+        Arrays.sort(points, (a, b)->(a[0]==b[0]?a[1]-b[1]:a[0]-b[0]));
+        Map<Integer, Integer> dup = new HashMap<>();
+        for(int i=0;i<n;i++)
+            dup.put(i, 1);
+        for(int i=1;i<n;i++){
+            int[] p1 = points[i];
+            int[] p2 = points[i-1];
+            if(p1[0]==p2[0] && p1[1]==p2[1])
+                dup.put(i, dup.get(i-1)+1);
+        }
+        Map<Double, Integer>[] dp = new Map[n];
+        for(int i=0;i<n;i++)
+            dp[i] = new HashMap<>();
+        for(int i=0;i<n;i++){
+            for (int j = 0; j < i; j++) {
+                Double slope = null;
+                int[] p1 = points[i];
+                int[] p2 = points[j];
+                if(p1[0]==p2[0] && p1[1]==p2[1]){
+                    continue;
+                }
+                if(p1[0]!=p2[0])
+                    slope = (p1[1]-p2[1])/(double)(p1[0]-p2[0]);
+                if(dp[j].containsKey(slope)){
+                    dp[i].put(slope, dp[j].get(slope)+dup.get(i));
+                }else{
+                    dp[i].put(slope, dup.get(i)+dup.get(j));
+                }
+                res = Math.max(res, dp[i].get(slope));
+            }
+        }
+        for(int i=0;i<n;i++)
+            res = Math.max(res, dup.get(i));
+        System.out.println(res);
+        return res;
+
+        /*if(points.length == 0)return 0;
+        Map<Double, Set<Double>> map = new HashMap<>();
+        int max = points.length == 0 ? 0 : 1;
+        for (int i = 0; i < points.length; i++) {
+            for (int j = i + 1; j < points.length; j++) {
+                int cnt = 0;
+                if (points[j][0] == points[i][0]) {
+                    for (int t = 0; t < points.length; t++) {
+                        if (points[t][0] == points[j][0]) {
+                            cnt++;
+                        }
+                    }
+                } else {
+                    double k = (double) (points[j][1] - points[i][1]) / (double) (points[j][0] - points[i][0]);
+                    double b = points[1][0] - k * points[i][0];
+
+                    if (map.containsKey(k)) {
+                        if (map.get(k).contains(b)) {
+                            continue;
+                        }
+                        map.get(k).add(b);
+                    } else {
+                        map.put(k, new HashSet<>());
+                        map.get(k).add(b);
+                    }
+
+                    for (int t = 0; t < points.length; t++) {
+                        if (myEquals(k * points[t][0] + b, points[t][1])) {
+                            cnt++;
+                        }
+                    }
+                }
+                if (cnt > max) {
+                    max = cnt;
+                }
+            }
+        }
+        System.out.println(max);
+        return max;*/
+    }
+
+    public static boolean wordBreak(String s, List<String> wordDict) {
+        Set<String> set = new HashSet<>(wordDict);
+        boolean[] is = new boolean[s.length() + 1];
+        is[0] = true;
+        for (int i = 0; i < s.length(); i++) {
+            for (int j = 0; j <= i; j++) {
+                if (!is[j]) continue;
+                if (set.contains(s.substring(j, i + 1))) {
+                    is[i + 1] = true;
+                    break;
+                }
+            }
+        }
+        return is[s.length()];
     }
 
     public static boolean search(int[] nums, int target){
@@ -300,38 +499,6 @@ public class tester {
             res.add(item);
         }
 
-
-/*
-
-        List<String> temp = new ArrayList<>();
-        temp.add(strs[0]);
-        res.add(new ArrayList<>(temp));
-        temp.clear();
-        for (int i = 1; i < strs.length ; i++) { // исходный
-            for (int j = 0; j < res.size(); j++) { //по всем подмассивам
-                temp = res.get(j); //подмассив
-                System.out.println(">>>>>>>>>>>  " + j);
-                boolean anagram = false;
-                for (int k = 0; k < temp.size(); k++) { //по элементам
-                    anagram = isAnagram(strs[i], temp.get(k));
-                    if(anagram) break;
-                }
-                if(anagram) {
-                    System.out.println("anagram <<< " + strs[i]);
-                    temp.add(strs[i]);
-                    System.out.println(temp);
-                    res.set(j, new ArrayList<>(temp));
-                    break;
-                } else if(j == res.size()-1){
-
-                    List<String> notA = new ArrayList<>();
-                    notA.add(strs[i]);
-                    res.add(new ArrayList<>(notA));
-                    break;
-                }
-            }
-        }*/
-     //   System.out.println(res);
         return res;
     }
 
@@ -391,19 +558,6 @@ public class tester {
 
         return result;
  ///////////////////////////////////
-       // return new ArrayList(new HashSet<List<Integer>>(res));
-
-
-
-
-/*        for (int i = 1; i < nums.length; i++) {
-            System.out.println(nums[i]);
-            nums[i-1] ^= nums[i];
-            nums[i-1] ^= (nums[i] ^= nums[i-1]);
-
-        }*/
-
-     //   return null;
     }
 
 }
